@@ -49,4 +49,13 @@ elif page == "Settings":
                 save_dropdowns(dropdowns)
                 st.success(f"Added '{new_option}' to {category}.")
                 st.experimental_rerun()
-        st.markdown("<ul>" + "".join([f"<li>{opt}</li>" for opt in options]) + "</ul>", unsafe_allow_html=True)
+
+        # Show current values and allow deletion
+        to_delete = st.multiselect(f"Select {category} entries to delete:", options, key=f"del_{category}")
+        if st.button(f"❌ Delete Selected from {category}", key=f"btn_del_{category}"):
+            dropdowns[category] = [opt for opt in options if opt not in to_delete]
+            save_dropdowns(dropdowns)
+            st.success(f"Removed selected entries from {category}.")
+            st.experimental_rerun()
+
+        st.markdown("<ul>" + "".join([f"<li>{opt}</li>" for opt in dropdowns[category]]) + "</ul>", unsafe_allow_html=True)

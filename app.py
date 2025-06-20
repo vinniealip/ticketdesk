@@ -1,6 +1,13 @@
 # --- app.py ---
 import streamlit as st
-from utils.data_handler import load_dropdowns, load_tickets, save_tickets, save_dropdowns, export_tickets_to_csv, export_tickets_to_excel
+from utils.data_handler import (
+    load_dropdowns,
+    load_tickets,
+    save_tickets,
+    save_dropdowns,
+    export_tickets_to_csv,
+    export_tickets_to_excel
+)
 import pandas as pd
 import os
 
@@ -40,22 +47,31 @@ if page == "Ticket Dashboard":
 elif page == "Settings":
     st.title("⚙️ Dropdown Settings")
 
-    for category, options in dropdowns.items():
+    for category in dropdowns:
         st.subheader(f"{category.replace('_', ' ').title()}")
-        new_option = st.text_input(f"Add to {category}", key=f"input_{category}")
-        if st.button(f"➕ Add", key=f"btn_add_{category}"):
-            if new_option and new_option not in options:
-                options.append(new_option)
-                save_dropdowns(dropdowns)
-                st.success(f"Added '{new_option}' to {category}.")
-                st.experimental_rerun()
 
-        # Show current values and allow deletion
-        to_delete = st.multiselect(f"Select {category} entries to delete:", options, key=f"del_{category}")
-        if st.button(f"❌ Delete Selected from {category}", key=f"btn_del_{category}"):
-            dropdowns[category] = [opt for opt in options if opt not in to_delete]
+        # Input for adding new entry
+        new_option = st.text_input(f"Add to {category}", key=f"input_{category}")
+        if st.button(f"➕ Add to {category}", key=f"btn_add_{category}"):
+            new_option = new_option.strip()
+            if new_option and new_option not in dropdowns[category]:
+                dropdowns[category].append(new_option)
+                save_dropdowns(dropdowns)
+                st.success(f"✅ Added '{new_option}' to {category}.")
+                st.experimental_rerun()
+            elif new_option in dropdowns[category]:
+                st.warning("⚠️ Entry already exists.")
+
+        # Multiselect for deleting entries
+        to_delete = st.multiselect(f"❌ Select entries to delete from {category}", dropdowns[category], key=f"delete_{category}")
+        if st.button(f"🗑️ Delete Selected from {category}", key=f"btn_del_{category}"):
+            dropdowns[category] = [opt for opt in dropdowns[category] if opt not in to_delete]
             save_dropdowns(dropdowns)
-            st.success(f"Removed selected entries from {category}.")
+            st.success("✅ Selected entries deleted.")
             st.experimental_rerun()
 
-        st.markdown("<ul>" + "".join([f"<li>{opt}</li>" for opt in dropdowns[category]]) + "</ul>", unsafe_allow_html=True)
+        # Show current entries
+        if dropdowns[category]:
+            st.markdown("<ul>" + "".join([f"<li>{opt}</li>" for opt in dropdowns[category]]) + "</ul>", unsafe_allow_html=True)
+        else:
+            st.info("ℹ️ No options currently defined.")

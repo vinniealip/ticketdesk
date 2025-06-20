@@ -1,0 +1,25 @@
+{
+  "ticket_status": [
+    "Open",
+    "Closed",
+    "Pending"
+  ],
+  "issue": [
+    "Network",
+    "Hardware",
+    "Power",
+    "Camera Offline"
+  ],
+  "project": [
+    "Project A",
+    "Project B"
+  ],
+  "site": [
+    "Site 1",
+    "Site 2"
+  ],
+  "isolation_status": [
+    "Ongoing",
+    "Resolved"
+  ]
+}

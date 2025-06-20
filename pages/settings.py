@@ -42,18 +42,22 @@ for label, key in dropdown_fields.items():
         settings[key] = []
 
     new_value = st.text_input(f"Add new {label}", key=f"new_{key}")
-    if st.button(f"➕ Add to {label}", key=f"add_{key}") and new_value.strip():
-        settings[key].append(new_value.strip())
-        save_settings()
-        st.success(f"Added: {new_value.strip()}")
-        st.experimental_rerun()
+    if st.button(f"➕ Add to {label}", key=f"add_{key}"):
+        cleaned = new_value.strip()
+        if cleaned and cleaned not in settings[key]:
+            settings[key].append(cleaned)
+            save_settings()
+            st.success(f"Added: {cleaned}")
+            st.session_state[f"new_{key}"] = ""  # Clear input manually
+        else:
+            st.warning("Value already exists or is empty.")
 
     to_remove = st.multiselect(f"Remove from {label}", settings[key], key=f"remove_{key}")
     if st.button(f"❌ Remove selected from {label}", key=f"removebtn_{key}") and to_remove:
         settings[key] = [item for item in settings[key] if item not in to_remove]
         save_settings()
         st.success(f"Removed: {', '.join(to_remove)}")
-        st.experimental_rerun()
+        st.session_state[f"remove_{key}"] = []
 
 # Sync into session state
 for key in settings:

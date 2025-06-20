@@ -41,14 +41,18 @@ for label, key in dropdown_fields.items():
     if key not in settings:
         settings[key] = []
 
-    new_value = st.text_input(f"Add new {label}", key=f"new_{key}")
+    key_name = f"new_{key}"
+    if key_name not in st.session_state:
+        st.session_state[key_name] = ""
+
+    new_value = st.text_input(f"Add new {label}", value=st.session_state[key_name], key=key_name)
     if st.button(f"➕ Add to {label}", key=f"add_{key}"):
         cleaned = new_value.strip()
         if cleaned and cleaned not in settings[key]:
             settings[key].append(cleaned)
             save_settings()
             st.success(f"Added: {cleaned}")
-            st.session_state[f"new_{key}"] = ""  # Clear input manually
+            st.session_state[key_name] = ""
         else:
             st.warning("Value already exists or is empty.")
 
